@@ -220,11 +220,11 @@ END GROUP
                 0x00000022                . = ALIGN (0x2)
  *(.text.*)
  .text._Z8portInitv
-                0x00000022       0x10 main.o
+                0x00000022        0xa main.o
                 0x00000022                _Z8portInitv
  .text._Z7pwmInitv
-                0x00000032        0xa main.o
-                0x00000032                _Z7pwmInitv
+                0x0000002c       0x10 main.o
+                0x0000002c                _Z7pwmInitv
  .text._Z6wdt_Onv
                 0x0000003c        0xe main.o
                 0x0000003c                _Z6wdt_Onv

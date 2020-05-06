@@ -3,6 +3,8 @@
  *
  * Created: 06.05.2020 23:15:51
  * Author : V.S.Kozlov
+ * firmware for controlling the water pump
+ * URL https://easyeda.com/MasterWind007/rpm-controller
  */ 
 
 #define F_CPU 9600000UL
@@ -21,7 +23,7 @@ void portInit(void)
 
 void pwmInit(void)
 {
-	TCCR0A = 0b10000011; //FastPWM non invert
+	TCCR0A = 0b10000011; //FastPWM non invert OCR0A enabled
 	TCCR0B = 0b00000011;	// PWM 9600000/256/64
 	TCNT0 = 255;
 	OCR0A = 0;

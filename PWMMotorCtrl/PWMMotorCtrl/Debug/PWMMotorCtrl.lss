@@ -65,28 +65,29 @@ void portInit(void)
 	PORTB =0b00000110;
   26:	86 e0       	ldi	r24, 0x06	; 6
   28:	88 bb       	out	0x18, r24	; 24
-	TCNT0 = 255; 
-  2a:	8f ef       	ldi	r24, 0xFF	; 255
-  2c:	82 bf       	out	0x32, r24	; 50
-	OCR0A = 0;
-  2e:	16 be       	out	0x36, r1	; 54
-  30:	08 95       	ret
+  2a:	08 95       	ret
 
-00000032 <_Z7pwmInitv>:
+0000002c <_Z7pwmInitv>:
 }
 
 void pwmInit(void)
 {
-	TCCR0A = 0b10000011; //FastPWM non invert
-  32:	83 e8       	ldi	r24, 0x83	; 131
-  34:	8f bd       	out	0x2f, r24	; 47
+	TCCR0A = 0b10000011; //FastPWM non invert OCR0A enabled
+  2c:	83 e8       	ldi	r24, 0x83	; 131
+  2e:	8f bd       	out	0x2f, r24	; 47
 	TCCR0B = 0b00000011;	// PWM 9600000/256/64
-  36:	83 e0       	ldi	r24, 0x03	; 3
-  38:	83 bf       	out	0x33, r24	; 51
+  30:	83 e0       	ldi	r24, 0x03	; 3
+  32:	83 bf       	out	0x33, r24	; 51
+	TCNT0 = 255;
+  34:	8f ef       	ldi	r24, 0xFF	; 255
+  36:	82 bf       	out	0x32, r24	; 50
+	OCR0A = 0;
+  38:	16 be       	out	0x36, r1	; 54
   3a:	08 95       	ret
 
 0000003c <_Z6wdt_Onv>:
 }
+
 void wdt_On(void)
 {
 	wdt_reset();
@@ -102,7 +103,6 @@ void wdt_On(void)
 
 0000004a <_Z7wdt_Offv>:
 }
-
 
 void wdt_Off(void)
 {
@@ -122,6 +122,7 @@ void wdt_Off(void)
 
 0000005c <main>:
 }
+
 int main(void)
 {
 	wdt_Off();
@@ -130,11 +131,11 @@ int main(void)
 	portInit();
   5e:	e1 df       	rcall	.-62     	; 0x22 <_Z8portInitv>
 	pwmInit();
-  60:	e8 df       	rcall	.-48     	; 0x32 <_Z7pwmInitv>
+  60:	e5 df       	rcall	.-54     	; 0x2c <_Z7pwmInitv>
 	wdt_On();
   62:	ec df       	rcall	.-40     	; 0x3c <_Z6wdt_Onv>
-	WDTCR = 0;
 }
+
 int main(void)
 {
 	wdt_Off();
