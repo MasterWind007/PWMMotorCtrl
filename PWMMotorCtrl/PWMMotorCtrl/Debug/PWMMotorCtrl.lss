@@ -3,29 +3,29 @@ PWMMotorCtrl.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         000000a8  00000000  00000000  00000054  2**1
+  0 .text         000000ce  00000000  00000000  00000054  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000000  00800060  00800060  000000fc  2**0
+  1 .data         00000000  00800060  00800060  00000122  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .comment      00000030  00000000  00000000  000000fc  2**0
+  2 .comment      00000030  00000000  00000000  00000122  2**0
                   CONTENTS, READONLY
-  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  0000012c  2**2
+  3 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00000154  2**2
                   CONTENTS, READONLY
-  4 .debug_aranges 00000050  00000000  00000000  00000168  2**0
+  4 .debug_aranges 00000058  00000000  00000000  00000190  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   000004ef  00000000  00000000  000001b8  2**0
+  5 .debug_info   0000045d  00000000  00000000  000001e8  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 000003e8  00000000  00000000  000006a7  2**0
+  6 .debug_abbrev 00000370  00000000  00000000  00000645  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   0000031a  00000000  00000000  00000a8f  2**0
+  7 .debug_line   000002e6  00000000  00000000  000009b5  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  00000084  00000000  00000000  00000dac  2**2
+  8 .debug_frame  000000a4  00000000  00000000  00000c9c  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    00000351  00000000  00000000  00000e30  2**0
+  9 .debug_str    0000030a  00000000  00000000  00000d40  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    00000054  00000000  00000000  00001181  2**0
+ 10 .debug_loc    0000005b  00000000  00000000  0000104a  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000040  00000000  00000000  000011d5  2**0
+ 11 .debug_ranges 00000048  00000000  00000000  000010a5  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -34,7 +34,7 @@ Disassembly of section .text:
    0:	09 c0       	rjmp	.+18     	; 0x14 <__ctors_end>
    2:	0e c0       	rjmp	.+28     	; 0x20 <__bad_interrupt>
    4:	0d c0       	rjmp	.+26     	; 0x20 <__bad_interrupt>
-   6:	0c c0       	rjmp	.+24     	; 0x20 <__bad_interrupt>
+   6:	22 c0       	rjmp	.+68     	; 0x4c <__vector_3>
    8:	0b c0       	rjmp	.+22     	; 0x20 <__bad_interrupt>
    a:	0a c0       	rjmp	.+20     	; 0x20 <__bad_interrupt>
    c:	09 c0       	rjmp	.+18     	; 0x20 <__bad_interrupt>
@@ -47,8 +47,8 @@ Disassembly of section .text:
   16:	1f be       	out	0x3f, r1	; 63
   18:	cf e9       	ldi	r28, 0x9F	; 159
   1a:	cd bf       	out	0x3d, r28	; 61
-  1c:	27 d0       	rcall	.+78     	; 0x6c <main>
-  1e:	42 c0       	rjmp	.+132    	; 0xa4 <_exit>
+  1c:	40 d0       	rcall	.+128    	; 0x9e <main>
+  1e:	55 c0       	rjmp	.+170    	; 0xca <_exit>
 
 00000020 <__bad_interrupt>:
   20:	ef cf       	rjmp	.-34     	; 0x0 <__vectors>
@@ -91,133 +91,151 @@ void pwmInit(void)
 	TCCR0B = 0b00000011; //PWM frequency  F_CPU/256/64
   3a:	83 e0       	ldi	r24, 0x03	; 3
   3c:	83 bf       	out	0x33, r24	; 51
+	TIMSK0 |= (1<<TOIE0);
+  3e:	89 b7       	in	r24, 0x39	; 57
+  40:	82 60       	ori	r24, 0x02	; 2
+  42:	89 bf       	out	0x39, r24	; 57
 	TCNT0 = 255;
-  3e:	8f ef       	ldi	r24, 0xFF	; 255
-  40:	82 bf       	out	0x32, r24	; 50
+  44:	8f ef       	ldi	r24, 0xFF	; 255
+  46:	82 bf       	out	0x32, r24	; 50
 	OCR0A = 0;
-  42:	16 be       	out	0x36, r1	; 54
-  44:	08 95       	ret
+  48:	16 be       	out	0x36, r1	; 54
+  4a:	08 95       	ret
 
-00000046 <_Z7adcReadv>:
+0000004c <__vector_3>:
 }
+
+ISR(TIM0_OVF_vect)
+{
+  4c:	1f 92       	push	r1
+  4e:	0f 92       	push	r0
+  50:	0f b6       	in	r0, 0x3f	; 63
+  52:	0f 92       	push	r0
+  54:	11 24       	eor	r1, r1
+  56:	8f 93       	push	r24
+	if (~PINB & (1<<BtnDwn)) MotPWM--;
+  58:	b1 99       	sbic	0x16, 1	; 22
+  5a:	03 c0       	rjmp	.+6      	; 0x62 <__vector_3+0x16>
+  5c:	86 b7       	in	r24, 0x36	; 54
+  5e:	81 50       	subi	r24, 0x01	; 1
+  60:	86 bf       	out	0x36, r24	; 54
+	if (~PINB & (1<<BtnUp)) MotPWM++;
+  62:	b2 99       	sbic	0x16, 2	; 22
+  64:	03 c0       	rjmp	.+6      	; 0x6c <__vector_3+0x20>
+  66:	86 b7       	in	r24, 0x36	; 54
+  68:	8f 5f       	subi	r24, 0xFF	; 255
+  6a:	86 bf       	out	0x36, r24	; 54
+}
+  6c:	8f 91       	pop	r24
+  6e:	0f 90       	pop	r0
+  70:	0f be       	out	0x3f, r0	; 63
+  72:	0f 90       	pop	r0
+  74:	1f 90       	pop	r1
+  76:	18 95       	reti
+
+00000078 <_Z7adcReadv>:
 
 uint8_t adcRead(void)
 {
 	uint8_t adc = 0;
 	ADCSRA |= (1 << ADSC);
-  46:	36 9a       	sbi	0x06, 6	; 6
+  78:	36 9a       	sbi	0x06, 6	; 6
 	adc = ADCH;
-  48:	85 b1       	in	r24, 0x05	; 5
+  7a:	85 b1       	in	r24, 0x05	; 5
 	return adc;
 } 
-  4a:	08 95       	ret
+  7c:	08 95       	ret
 
-0000004c <_Z6wdt_Onv>:
+0000007e <_Z6wdt_Onv>:
 void wdt_On(void)
 {
 	wdt_reset();
-  4c:	a8 95       	wdr
+  7e:	a8 95       	wdr
 	WDTCR |= (1<<WDCE) | (1<<WDE); //WDT Change Enabled, WDT enabled
-  4e:	81 b5       	in	r24, 0x21	; 33
-  50:	88 61       	ori	r24, 0x18	; 24
-  52:	81 bd       	out	0x21, r24	; 33
+  80:	81 b5       	in	r24, 0x21	; 33
+  82:	88 61       	ori	r24, 0x18	; 24
+  84:	81 bd       	out	0x21, r24	; 33
 	WDTCR = (1<<WDE) | (1<<WDP2) | (1<<WDP1); // WDT prescaler (time-out) 1s
-  54:	8e e0       	ldi	r24, 0x0E	; 14
-  56:	81 bd       	out	0x21, r24	; 33
-  58:	08 95       	ret
+  86:	8e e0       	ldi	r24, 0x0E	; 14
+  88:	81 bd       	out	0x21, r24	; 33
+  8a:	08 95       	ret
 
-0000005a <_Z7wdt_Offv>:
+0000008c <_Z7wdt_Offv>:
 }
 
 void wdt_Off(void)
 {
 	wdt_reset();
-  5a:	a8 95       	wdr
+  8c:	a8 95       	wdr
 	MCUSR &= ~(1<<WDRF);	
-  5c:	84 b7       	in	r24, 0x34	; 52
-  5e:	87 7f       	andi	r24, 0xF7	; 247
-  60:	84 bf       	out	0x34, r24	; 52
+  8e:	84 b7       	in	r24, 0x34	; 52
+  90:	87 7f       	andi	r24, 0xF7	; 247
+  92:	84 bf       	out	0x34, r24	; 52
 	WDTCR |= (1<<WDCE) | (1<<WDE);
-  62:	81 b5       	in	r24, 0x21	; 33
-  64:	88 61       	ori	r24, 0x18	; 24
-  66:	81 bd       	out	0x21, r24	; 33
+  94:	81 b5       	in	r24, 0x21	; 33
+  96:	88 61       	ori	r24, 0x18	; 24
+  98:	81 bd       	out	0x21, r24	; 33
 	WDTCR = 0;
-  68:	11 bc       	out	0x21, r1	; 33
-  6a:	08 95       	ret
+  9a:	11 bc       	out	0x21, r1	; 33
+  9c:	08 95       	ret
 
-0000006c <main>:
+0000009e <main>:
 }
 
 int main(void)
 {
 	wdt_Off();
-  6c:	f6 df       	rcall	.-20     	; 0x5a <_Z7wdt_Offv>
-	uint8_t Motlvl = 0;
+  9e:	f6 df       	rcall	.-20     	; 0x8c <_Z7wdt_Offv>
 	portInit();
-  6e:	d9 df       	rcall	.-78     	; 0x22 <_Z8portInitv>
+  a0:	c0 df       	rcall	.-128    	; 0x22 <_Z8portInitv>
 	pwmInit();
-  70:	e2 df       	rcall	.-60     	; 0x36 <_Z7pwmInitv>
+  a2:	c9 df       	rcall	.-110    	; 0x36 <_Z7pwmInitv>
 	wdt_On();
-  72:	ec df       	rcall	.-40     	; 0x4c <_Z6wdt_Onv>
+  a4:	ec df       	rcall	.-40     	; 0x7e <_Z6wdt_Onv>
     adcInit();
-  74:	db df       	rcall	.-74     	; 0x2c <_Z7adcInitv>
-}
+  a6:	c2 df       	rcall	.-124    	; 0x2c <_Z7adcInitv>
+	sei();
+  a8:	78 94       	sei
 
-int main(void)
-{
-	wdt_Off();
-	uint8_t Motlvl = 0;
-  76:	80 e0       	ldi	r24, 0x00	; 0
-	pwmInit();
-	wdt_On();
+	while (1) 
+    {
+		if (~PINB & (1<<Jp1)) MotPWM = adcRead();		
+		if (MotPWM>=254) MotPWM = 253;
+  aa:	dd ef       	ldi	r29, 0xFD	; 253
+		if (MotPWM <=0) MotPWM = 1;
+  ac:	c1 e0       	ldi	r28, 0x01	; 1
     adcInit();
+	sei();
+
 	while (1) 
     {
-		if (~PINB & (1<<Jp1)) Motlvl = adcRead(); 
-  78:	b4 9b       	sbis	0x16, 4	; 22
-  7a:	e5 df       	rcall	.-54     	; 0x46 <_Z7adcReadv>
-		if (~PINB & (1<<BtnDwn)) Motlvl--;
-  7c:	b1 9b       	sbis	0x16, 1	; 22
-  7e:	81 50       	subi	r24, 0x01	; 1
-		if (~PINB & (1<<BtnUp)) Motlvl++;
-  80:	b2 9b       	sbis	0x16, 2	; 22
-  82:	8f 5f       	subi	r24, 0xFF	; 255
-		if (Motlvl>=254) Motlvl = 255;
-  84:	8e 3f       	cpi	r24, 0xFE	; 254
-  86:	20 f4       	brcc	.+8      	; 0x90 <main+0x24>
-		if (Motlvl <=0) Motlvl = 1;
-  88:	81 11       	cpse	r24, r1
-  8a:	03 c0       	rjmp	.+6      	; 0x92 <main+0x26>
-  8c:	81 e0       	ldi	r24, 0x01	; 1
-  8e:	01 c0       	rjmp	.+2      	; 0x92 <main+0x26>
-	while (1) 
-    {
-		if (~PINB & (1<<Jp1)) Motlvl = adcRead(); 
-		if (~PINB & (1<<BtnDwn)) Motlvl--;
-		if (~PINB & (1<<BtnUp)) Motlvl++;
-		if (Motlvl>=254) Motlvl = 255;
-  90:	8f ef       	ldi	r24, 0xFF	; 255
-		if (Motlvl <=0) Motlvl = 1;
-		MotPWM = Motlvl;
-  92:	86 bf       	out	0x36, r24	; 54
+		if (~PINB & (1<<Jp1)) MotPWM = adcRead();		
+  ae:	b4 99       	sbic	0x16, 4	; 22
+  b0:	02 c0       	rjmp	.+4      	; 0xb6 <__stack+0x17>
+  b2:	e2 df       	rcall	.-60     	; 0x78 <_Z7adcReadv>
+  b4:	86 bf       	out	0x36, r24	; 54
+		if (MotPWM>=254) MotPWM = 253;
+  b6:	86 b7       	in	r24, 0x36	; 54
+  b8:	8e 3f       	cpi	r24, 0xFE	; 254
+  ba:	08 f0       	brcs	.+2      	; 0xbe <__stack+0x1f>
+  bc:	d6 bf       	out	0x36, r29	; 54
+		if (MotPWM <=0) MotPWM = 1;
+  be:	86 b7       	in	r24, 0x36	; 54
+  c0:	81 11       	cpse	r24, r1
+  c2:	01 c0       	rjmp	.+2      	; 0xc6 <__stack+0x27>
+  c4:	c6 bf       	out	0x36, r28	; 54
 		wdt_reset();
-  94:	a8 95       	wdr
-	#else
-		//round up by default
-		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
-	#endif
+  c6:	a8 95       	wdr
+	pwmInit();
+	wdt_On();
+    adcInit();
+	sei();
 
-	__builtin_avr_delay_cycles(__ticks_dc);
-  96:	ef e5       	ldi	r30, 0x5F	; 95
-  98:	f9 e0       	ldi	r31, 0x09	; 9
-  9a:	31 97       	sbiw	r30, 0x01	; 1
-  9c:	f1 f7       	brne	.-4      	; 0x9a <main+0x2e>
-  9e:	00 c0       	rjmp	.+0      	; 0xa0 <__stack+0x1>
-  a0:	00 00       	nop
-  a2:	ea cf       	rjmp	.-44     	; 0x78 <main+0xc>
+	while (1) 
+  c8:	f2 cf       	rjmp	.-28     	; 0xae <__stack+0xf>
 
-000000a4 <_exit>:
-  a4:	f8 94       	cli
+000000ca <_exit>:
+  ca:	f8 94       	cli
 
-000000a6 <__stop_program>:
-  a6:	ff cf       	rjmp	.-2      	; 0xa6 <__stop_program>
+000000cc <__stop_program>:
+  cc:	ff cf       	rjmp	.-2      	; 0xcc <__stop_program>

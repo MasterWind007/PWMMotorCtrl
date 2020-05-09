@@ -152,7 +152,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000       0xa8
+.text           0x00000000       0xce
  *(.vectors)
  .vectors       0x00000000       0x14 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATtiny_DFP/1.2.118/gcc/dev/attiny13a/avr25/tiny-stack/crtattiny13a.o
                 0x00000000                __vector_default
@@ -210,7 +210,6 @@ END GROUP
                 0x00000020                __vector_1
                 0x00000020                __bad_interrupt
                 0x00000020                __vector_6
-                0x00000020                __vector_3
                 0x00000020                __vector_7
                 0x00000020                __vector_5
                 0x00000020                __vector_4
@@ -226,24 +225,27 @@ END GROUP
                 0x0000002c        0xa main.o
                 0x0000002c                _Z7adcInitv
  .text._Z7pwmInitv
-                0x00000036       0x10 main.o
+                0x00000036       0x16 main.o
                 0x00000036                _Z7pwmInitv
+ .text.__vector_3
+                0x0000004c       0x2c main.o
+                0x0000004c                __vector_3
  .text._Z7adcReadv
-                0x00000046        0x6 main.o
-                0x00000046                _Z7adcReadv
+                0x00000078        0x6 main.o
+                0x00000078                _Z7adcReadv
  .text._Z6wdt_Onv
-                0x0000004c        0xe main.o
-                0x0000004c                _Z6wdt_Onv
+                0x0000007e        0xe main.o
+                0x0000007e                _Z6wdt_Onv
  .text._Z7wdt_Offv
-                0x0000005a       0x12 main.o
-                0x0000005a                _Z7wdt_Offv
- .text.main     0x0000006c       0x38 main.o
-                0x0000006c                main
-                0x000000a4                . = ALIGN (0x2)
+                0x0000008c       0x12 main.o
+                0x0000008c                _Z7wdt_Offv
+ .text.main     0x0000009e       0x2c main.o
+                0x0000009e                main
+                0x000000ca                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x000000a4        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr25/tiny-stack\libgcc.a(_exit.o)
-                0x000000a4                _exit
-                0x000000a4                exit
+ .fini9         0x000000ca        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr25/tiny-stack\libgcc.a(_exit.o)
+                0x000000ca                _exit
+                0x000000ca                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -262,11 +264,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x000000a4        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr25/tiny-stack\libgcc.a(_exit.o)
+ .fini0         0x000000ca        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr25/tiny-stack\libgcc.a(_exit.o)
  *(.fini0)
-                0x000000a8                _etext = .
+                0x000000ce                _etext = .
 
-.data           0x00800060        0x0 load address 0x000000a8
+.data           0x00800060        0x0 load address 0x000000ce
                 [!provide]                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -283,8 +285,8 @@ END GROUP
  *(.bss*)
  *(COMMON)
                 [!provide]                PROVIDE (__bss_end, .)
-                0x000000a8                __data_load_start = LOADADDR (.data)
-                0x000000a8                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x000000ce                __data_load_start = LOADADDR (.data)
+                0x000000ce                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800060        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
@@ -355,42 +357,42 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000       0x50
+.debug_aranges  0x00000000       0x58
  *(.debug_aranges)
  .debug_aranges
-                0x00000000       0x50 main.o
+                0x00000000       0x58 main.o
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000      0x4ef
+.debug_info     0x00000000      0x45d
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x2dc C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATtiny_DFP/1.2.118/gcc/dev/attiny13a/avr25/tiny-stack/crtattiny13a.o
- .debug_info    0x000002dc      0x213 main.o
+ .debug_info    0x000002dc      0x181 main.o
 
-.debug_abbrev   0x00000000      0x3e8
+.debug_abbrev   0x00000000      0x370
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x2b6 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATtiny_DFP/1.2.118/gcc/dev/attiny13a/avr25/tiny-stack/crtattiny13a.o
- .debug_abbrev  0x000002b6      0x132 main.o
+ .debug_abbrev  0x000002b6       0xba main.o
 
-.debug_line     0x00000000      0x31a
+.debug_line     0x00000000      0x2e6
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000       0xca C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATtiny_DFP/1.2.118/gcc/dev/attiny13a/avr25/tiny-stack/crtattiny13a.o
- .debug_line    0x000000ca      0x250 main.o
+ .debug_line    0x000000ca      0x21c main.o
 
-.debug_frame    0x00000000       0x84
+.debug_frame    0x00000000       0xa4
  *(.debug_frame)
- .debug_frame   0x00000000       0x84 main.o
+ .debug_frame   0x00000000       0xa4 main.o
 
-.debug_str      0x00000000      0x351
+.debug_str      0x00000000      0x30a
  *(.debug_str)
  .debug_str     0x00000000      0x100 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATtiny_DFP/1.2.118/gcc/dev/attiny13a/avr25/tiny-stack/crtattiny13a.o
- .debug_str     0x00000100      0x251 main.o
-                                0x285 (size before relaxing)
+ .debug_str     0x00000100      0x20a main.o
+                                0x23e (size before relaxing)
 
-.debug_loc      0x00000000       0x54
+.debug_loc      0x00000000       0x5b
  *(.debug_loc)
- .debug_loc     0x00000000       0x54 main.o
+ .debug_loc     0x00000000       0x5b main.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -410,9 +412,9 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000       0x40
+.debug_ranges   0x00000000       0x48
  *(.debug_ranges)
- .debug_ranges  0x00000000       0x40 main.o
+ .debug_ranges  0x00000000       0x48 main.o
 
 .debug_macro
  *(.debug_macro)

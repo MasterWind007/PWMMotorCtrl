@@ -9,7 +9,7 @@
 
 #define F_CPU 9600000UL
 #include <avr/io.h>
-#include <util/delay.h>
+#include <avr/interrupt.h>
 #include <avr/wdt.h>
 #define BtnDwn		PINB1 // RPM Down
 #define BtnUp		PINB2 // RPM Up
@@ -32,8 +32,15 @@ void pwmInit(void)
 {
 	TCCR0A = 0b10000011; //FastPWM non invert OCR0A enabled
 	TCCR0B = 0b00000011; //PWM frequency  F_CPU/256/64
+	TIMSK0 |= (1<<TOIE0);
 	TCNT0 = 255;
 	OCR0A = 0;
+}
+
+ISR(TIM0_OVF_vect)
+{
+	if (~PINB & (1<<BtnDwn)) MotPWM--;
+	if (~PINB & (1<<BtnUp)) MotPWM++;
 }
 
 uint8_t adcRead(void)
@@ -61,21 +68,18 @@ void wdt_Off(void)
 int main(void)
 {
 	wdt_Off();
-	uint8_t Motlvl = 0;
 	portInit();
 	pwmInit();
 	wdt_On();
     adcInit();
+	sei();
+
 	while (1) 
     {
-		if (~PINB & (1<<Jp1)) Motlvl = adcRead(); 
-		if (~PINB & (1<<BtnDwn)) Motlvl--;
-		if (~PINB & (1<<BtnUp)) Motlvl++;
-		if (Motlvl>=254) Motlvl = 255;
-		if (Motlvl <=0) Motlvl = 1;
-		MotPWM = Motlvl;
+		if (~PINB & (1<<Jp1)) MotPWM = adcRead();		
+		if (MotPWM>=254) MotPWM = 253;
+		if (MotPWM <=0) MotPWM = 1;
 		wdt_reset();
-		_delay_ms(1);
     }
 }
 
