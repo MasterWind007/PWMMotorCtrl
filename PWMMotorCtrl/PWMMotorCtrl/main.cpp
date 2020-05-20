@@ -13,8 +13,8 @@
 #include <avr/wdt.h>
 #define BtnDwn		PINB1 // RPM Down
 #define BtnUp		PINB2 // RPM Up
-#define Jp1			PINB4 //jumper to ADC Enabled on board
-#define MotPWM		OCR0A 
+#define Jp1			PINB4 // jumper to ADC Enabled on board
+#define MotPWM		OCR0A // RPM Level
 
 void portInit(void)
 {
@@ -24,31 +24,29 @@ void portInit(void)
 
 void adcInit(void)
 {
-	ADCSRA = 0b11000111; //Enabled, StartConversion, F_CPU/128  
+	ADCSRA = 0b11000111; //ADC_Enabled, StartConversion, F_CPU/128  
 	ADMUX  = 0b01100011; // AREF-internal, ADLAR-Right, input-ADC3
 }
 
 void pwmInit(void)
 {
 	TCCR0A = 0b10000011; //FastPWM non invert OCR0A enabled
-	TCCR0B = 0b00000011; //PWM frequency  F_CPU/256/64
+	TCCR0B = 0b00000011; //PWM frequency  (F_CPU/256/64=585.9375Hz) 0.002s 
 	TIMSK0 |= (1<<TOIE0);
 	TCNT0 = 255;
 	OCR0A = 0;
 }
 
-ISR(TIM0_OVF_vect)
+ISR(TIM0_OVF_vect)  //Buttons State
 {
-	if (~PINB & (1<<BtnDwn)) MotPWM--;
-	if (~PINB & (1<<BtnUp)) MotPWM++;
+	if (~PINB & (1<<BtnDwn)) MotPWM--; //RPM -
+	if (~PINB & (1<<BtnUp)) MotPWM++;  //RPM +
 }
 
 uint8_t adcRead(void)
 {
-	uint8_t adc = 0;
 	ADCSRA |= (1 << ADSC);
-	adc = ADCH;
-	return adc;
+	return ADCH;
 } 
 void wdt_On(void)
 {

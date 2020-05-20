@@ -13,19 +13,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   4 .debug_aranges 00000058  00000000  00000000  00000190  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_info   0000045d  00000000  00000000  000001e8  2**0
+  5 .debug_info   00000449  00000000  00000000  000001e8  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_abbrev 00000370  00000000  00000000  00000645  2**0
+  6 .debug_abbrev 0000035f  00000000  00000000  00000631  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   000002e6  00000000  00000000  000009b5  2**0
+  7 .debug_line   000002e6  00000000  00000000  00000990  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_frame  000000a4  00000000  00000000  00000c9c  2**2
+  8 .debug_frame  000000a4  00000000  00000000  00000c78  2**2
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_str    0000030a  00000000  00000000  00000d40  2**0
+  9 .debug_str    0000030a  00000000  00000000  00000d1c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_loc    0000005b  00000000  00000000  0000104a  2**0
+ 10 .debug_loc    0000003c  00000000  00000000  00001026  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_ranges 00000048  00000000  00000000  000010a5  2**0
+ 11 .debug_ranges 00000048  00000000  00000000  00001062  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -54,8 +54,8 @@ Disassembly of section .text:
   20:	ef cf       	rjmp	.-34     	; 0x0 <__vectors>
 
 00000022 <_Z8portInitv>:
-#define Jp1			PINB4 //jumper to ADC Enabled on board
-#define MotPWM		OCR0A 
+#define Jp1			PINB4 // jumper to ADC Enabled on board
+#define MotPWM		OCR0A // RPM Level
 
 void portInit(void)
 {
@@ -72,7 +72,7 @@ void portInit(void)
 
 void adcInit(void)
 {
-	ADCSRA = 0b11000111; //Enabled, StartConversion, F_CPU/128  
+	ADCSRA = 0b11000111; //ADC_Enabled, StartConversion, F_CPU/128  
   2c:	87 ec       	ldi	r24, 0xC7	; 199
   2e:	86 b9       	out	0x06, r24	; 6
 	ADMUX  = 0b01100011; // AREF-internal, ADLAR-Right, input-ADC3
@@ -88,7 +88,7 @@ void pwmInit(void)
 	TCCR0A = 0b10000011; //FastPWM non invert OCR0A enabled
   36:	83 e8       	ldi	r24, 0x83	; 131
   38:	8f bd       	out	0x2f, r24	; 47
-	TCCR0B = 0b00000011; //PWM frequency  F_CPU/256/64
+	TCCR0B = 0b00000011; //PWM frequency  (F_CPU/256/64=585.9375Hz) 0.002s 
   3a:	83 e0       	ldi	r24, 0x03	; 3
   3c:	83 bf       	out	0x33, r24	; 51
 	TIMSK0 |= (1<<TOIE0);
@@ -105,7 +105,7 @@ void pwmInit(void)
 0000004c <__vector_3>:
 }
 
-ISR(TIM0_OVF_vect)
+ISR(TIM0_OVF_vect)  //Buttons State
 {
   4c:	1f 92       	push	r1
   4e:	0f 92       	push	r0
@@ -113,13 +113,13 @@ ISR(TIM0_OVF_vect)
   52:	0f 92       	push	r0
   54:	11 24       	eor	r1, r1
   56:	8f 93       	push	r24
-	if (~PINB & (1<<BtnDwn)) MotPWM--;
+	if (~PINB & (1<<BtnDwn)) MotPWM--; //RPM -
   58:	b1 99       	sbic	0x16, 1	; 22
   5a:	03 c0       	rjmp	.+6      	; 0x62 <__vector_3+0x16>
   5c:	86 b7       	in	r24, 0x36	; 54
   5e:	81 50       	subi	r24, 0x01	; 1
   60:	86 bf       	out	0x36, r24	; 54
-	if (~PINB & (1<<BtnUp)) MotPWM++;
+	if (~PINB & (1<<BtnUp)) MotPWM++;  //RPM +
   62:	b2 99       	sbic	0x16, 2	; 22
   64:	03 c0       	rjmp	.+6      	; 0x6c <__vector_3+0x20>
   66:	86 b7       	in	r24, 0x36	; 54
@@ -137,12 +137,10 @@ ISR(TIM0_OVF_vect)
 
 uint8_t adcRead(void)
 {
-	uint8_t adc = 0;
 	ADCSRA |= (1 << ADSC);
   78:	36 9a       	sbi	0x06, 6	; 6
-	adc = ADCH;
+	return ADCH;
   7a:	85 b1       	in	r24, 0x05	; 5
-	return adc;
 } 
   7c:	08 95       	ret
 
